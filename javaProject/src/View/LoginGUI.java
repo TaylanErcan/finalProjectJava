@@ -8,20 +8,32 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.Font;
 import javax.swing.SwingConstants;
 import java.awt.Color;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.awt.event.ActionEvent;
+import javax.swing.JPasswordField;
+import Helper.*;
+import Model.Bashekim;
 
 public class LoginGUI extends JFrame {
 
 	private JPanel wrapper_pane;
 	private JTextField txtHastaTc;
-	private JTextField txtHastaSifre;
-	private JTextField textField;
-	private JTextField textField_1;
+	private JTextField txtDoktorTc;
+	private JPasswordField passwordFieldDoktor;
+	private JPasswordField passwordFieldHasta;
+	private DBConnection conn= new DBConnection();
 
 	/**
 	 * Launch the application.
@@ -71,48 +83,45 @@ public class LoginGUI extends JFrame {
 		wrapper_TabPane.addTab("Doktor Giriþi", null, panelDoctor, null);
 		panelDoctor.setLayout(null);
 		
-		JLabel lblTcNo_1 = new JLabel("T.C Numaran\u0131z:");
-		lblTcNo_1.setBounds(50, 16, 130, 28);
-		lblTcNo_1.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 16));
-		panelDoctor.add(lblTcNo_1);
+		JLabel lblDoktorTc = new JLabel("T.C Numaran\u0131z:");
+		lblDoktorTc.setBounds(50, 16, 130, 28);
+		lblDoktorTc.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 16));
+		panelDoctor.add(lblDoktorTc);
 		
-		JLabel lblSifre_1 = new JLabel("\u015Eifre:");
-		lblSifre_1.setBounds(77, 55, 55, 28);
-		lblSifre_1.setFont(new Font("Segoe UI Semibold", Font.ITALIC, 16));
-		panelDoctor.add(lblSifre_1);
+		JLabel lblDoktorPassword = new JLabel("\u015Eifre:");
+		lblDoktorPassword.setBounds(77, 55, 55, 28);
+		lblDoktorPassword.setFont(new Font("Segoe UI Semibold", Font.ITALIC, 16));
+		panelDoctor.add(lblDoktorPassword);
 		
-		textField = new JTextField();
-		textField.setBounds(203, 57, 162, 28);
-		textField.setText("fsdfkshhfsf");
-		textField.setFont(new Font("Tahoma", Font.PLAIN, 13));
-		textField.setColumns(10);
-		panelDoctor.add(textField);
-		
-		textField_1 = new JTextField();
-		textField_1.setBounds(203, 18, 162, 28);
-		textField_1.setText("fsdfkshhfsf");
-		textField_1.setFont(new Font("Tahoma", Font.PLAIN, 13));
-		textField_1.setColumns(10);
-		panelDoctor.add(textField_1);
+		txtDoktorTc = new JTextField();
+		txtDoktorTc.setBounds(203, 18, 162, 28);
+		txtDoktorTc.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		txtDoktorTc.setColumns(10);
+		panelDoctor.add(txtDoktorTc);
 		
 		JButton btnDoktorLogin = new JButton("Giri\u015F Yap");
+		
 		btnDoktorLogin.setBounds(50, 138, 341, 43);
 		panelDoctor.add(btnDoktorLogin);
+		
+		passwordFieldDoktor = new JPasswordField();
+		passwordFieldDoktor.setBounds(203, 62, 162, 20);
+		panelDoctor.add(passwordFieldDoktor);
 		
 		JPanel panelHasta = new JPanel();
 		panelHasta.setBackground(Color.WHITE);
 		wrapper_TabPane.addTab("Hasta Giriþi", null, panelHasta, null);
 		panelHasta.setLayout(null);
 		
-		JLabel lblTcNo = new JLabel("T.C Numaran\u0131z:");
-		lblTcNo.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 16));
-		lblTcNo.setBounds(50, 16, 130, 28);
-		panelHasta.add(lblTcNo);
+		JLabel lblHastaTc = new JLabel("T.C Numaran\u0131z:");
+		lblHastaTc.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 16));
+		lblHastaTc.setBounds(50, 16, 130, 28);
+		panelHasta.add(lblHastaTc);
 		
-		JLabel lblSifre = new JLabel("\u015Eifre:");
-		lblSifre.setFont(new Font("Segoe UI Semibold", Font.ITALIC, 16));
-		lblSifre.setBounds(77, 55, 55, 28);
-		panelHasta.add(lblSifre);
+		JLabel lblHastaSifre = new JLabel("\u015Eifre:");
+		lblHastaSifre.setFont(new Font("Segoe UI Semibold", Font.ITALIC, 16));
+		lblHastaSifre.setBounds(79, 55, 55, 28);
+		panelHasta.add(lblHastaSifre);
 		
 		txtHastaTc = new JTextField();
 		txtHastaTc.setFont(new Font("Tahoma", Font.PLAIN, 13));
@@ -121,13 +130,6 @@ public class LoginGUI extends JFrame {
 		panelHasta.add(txtHastaTc);
 		txtHastaTc.setColumns(10);
 		
-		txtHastaSifre = new JTextField();
-		txtHastaSifre.setText("fsdfkshhfsf");
-		txtHastaSifre.setFont(new Font("Tahoma", Font.PLAIN, 13));
-		txtHastaSifre.setColumns(10);
-		txtHastaSifre.setBounds(203, 57, 162, 28);
-		panelHasta.add(txtHastaSifre);
-		
 		JButton btnHastaRegister = new JButton("Kay\u0131t Ol");
 		btnHastaRegister.setBounds(60, 138, 142, 43);
 		panelHasta.add(btnHastaRegister);
@@ -135,5 +137,40 @@ public class LoginGUI extends JFrame {
 		JButton btnHastaLogin = new JButton("Giri\u015F Yap");
 		btnHastaLogin.setBounds(249, 138, 142, 43);
 		panelHasta.add(btnHastaLogin);
+		
+		passwordFieldHasta = new JPasswordField();
+		passwordFieldHasta.setBounds(203, 62, 162, 20);
+		panelHasta.add(passwordFieldHasta);
+		
+		btnDoktorLogin.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(txtDoktorTc.getText().length() == 0 || passwordFieldDoktor.getText().length() == 0) {
+					Helper.showMessage("fill");
+				}else {
+					try {
+						Connection con= conn.conDb();
+						Statement st= con.createStatement();
+						ResultSet resultSet= st.executeQuery("SELECT * FROM user");
+						while(resultSet.next()) {
+							if(txtDoktorTc.getText().equals(resultSet.getString("Tc_No")) &&
+									passwordFieldDoktor.getText().equals(resultSet.getString("Password"))) {
+								Bashekim bhekim= new Bashekim();
+								bhekim.setId(resultSet.getInt("Id"));
+								bhekim.setTc_No(resultSet.getString("Tc_No"));
+								bhekim.setPassword(resultSet.getString("Password"));
+								bhekim.setName(resultSet.getString("Name"));
+								bhekim.setType(resultSet.getString("Type"));
+								BashekimGUI bGUI= new BashekimGUI(bhekim);
+								bGUI.setVisible(true);
+								dispose();
+								
+							}
+						}
+					} catch (SQLException ex) {
+						ex.printStackTrace();
+					}
+				}
+			}
+		});
 	}
 }
