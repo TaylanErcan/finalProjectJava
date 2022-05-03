@@ -1,52 +1,52 @@
 package Model;
 
+import Helper.DBConnection;
+
 public class User {
 	
 	private int Id;
-	public int getId() {
-		return Id;
-	}
-	public User(int id, String tc_No, String password, String name, String type) {
-		super();
-		Id = id;
-		Tc_No = tc_No;
-		Password = password;
-		Name = name;
-		Type = type;
+	private String tcno,name,password,type;
+	DBConnection conn= new DBConnection();
+	
+	public User(int id, String Tc_No, String password, String name, String type) {
+		this.Id = id;
+		this.tcno = Tc_No;
+		this.password = password;
+		this.name = name;
+		this.type = type;
 	}
 	
 	public User() {}
 	
-	
+	public int getId() {
+		return this.Id;
+	}
 	public void setId(int id) {
-		Id = id;
+		this.Id = id;
 	}
 	public String getTc_No() {
-		return Tc_No;
+		return this.tcno;
 	}
-	public void setTc_No(String tc_No) {
-		Tc_No = tc_No;
+	public void setTc_No(String Tc_No) {
+		this.tcno = Tc_No;
 	}
 	public String getPassword() {
-		return Password;
+		return this.password;
 	}
 	public void setPassword(String password) {
-		Password = password;
+		this.password = password;
 	}
 	public String getName() {
-		return Name;
+		return this.name;
 	}
 	public void setName(String name) {
-		Name = name;
+		this.name = name;
 	}
 	public String getType() {
-		return Type;
+		return this.type;
 	}
 	public void setType(String type) {
-		Type = type;
+		this.type = type;
 	}
-	private String Tc_No;
-	private String Password;
-	private String Name;
-	private String Type;
+	
 }

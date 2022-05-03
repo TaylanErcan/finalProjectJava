@@ -6,12 +6,15 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
 
 import Model.Bashekim;
 
 import java.awt.Color;
 import javax.swing.JLabel;
 import java.awt.Font;
+import java.sql.SQLException;
+
 import javax.swing.JButton;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
@@ -21,6 +24,10 @@ import javax.swing.JTable;
 
 public class BashekimGUI extends JFrame {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	static Bashekim bashekim= new Bashekim();
 	private JPanel contentPaneBashekim;
 	private JTextField txtDNameSurname;
@@ -28,6 +35,8 @@ public class BashekimGUI extends JFrame {
 	private JPasswordField passwordFieldDoktor;
 	private JTextField txtDoktorId;
 	private JTable jtableDoktorList;
+	private DefaultTableModel doctorModel= null;
+	private Object[] doctorData= null;
 
 	/**
 	 * Launch the application.
@@ -47,8 +56,26 @@ public class BashekimGUI extends JFrame {
 
 	/**
 	 * Create the frame.
+	 * @throws SQLException 
 	 */
-	public BashekimGUI(Bashekim bashekim) {
+	public BashekimGUI(Bashekim bashekim) throws SQLException {
+		
+		doctorModel= new DefaultTableModel();
+		Object[] colDoctorName= new Object[4];
+		colDoctorName[0]="ID";		
+		colDoctorName[1]="TC No";				
+		colDoctorName[2]="Þifre";
+		colDoctorName[3]="Ad Soyad";		
+		doctorModel.setColumnIdentifiers(colDoctorName);
+		doctorData= new Object[4];
+		for(int i=0; i<bashekim.GetDoctorList().size(); i++)	{
+			doctorData[0]=bashekim.GetDoctorList().get(i).getId();
+			doctorData[1]=bashekim.GetDoctorList().get(i).getTc_No();
+			doctorData[2]=bashekim.GetDoctorList().get(i).getPassword();
+			doctorData[3]=bashekim.GetDoctorList().get(i).getName();
+			doctorModel.addRow(doctorData);
+		}	
+				
 		setResizable(false);
 		setTitle("Hospital Automation System");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -131,7 +158,7 @@ public class BashekimGUI extends JFrame {
 		scrollPaneDoktor.setBounds(10, 8, 361, 307);
 		panel.add(scrollPaneDoktor);
 		
-		jtableDoktorList = new JTable();
+		jtableDoktorList = new JTable(doctorModel);
 		scrollPaneDoktor.setViewportView(jtableDoktorList);
 	}
 }
