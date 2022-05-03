@@ -21,13 +21,16 @@ import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import Helper.*;
 
 public class BashekimGUI extends JFrame {
 	
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	
 	static Bashekim bashekim= new Bashekim();
 	private JPanel contentPaneBashekim;
 	private JTextField txtDNameSurname;
@@ -134,6 +137,7 @@ public class BashekimGUI extends JFrame {
 		panel.add(passwordFieldDoktor);
 		
 		JButton btnAddDoktor = new JButton("Ekle");
+		
 		btnAddDoktor.setFont(new Font("Times New Roman", Font.PLAIN, 17));
 		btnAddDoktor.setBounds(381, 177, 140, 32);
 		panel.add(btnAddDoktor);
@@ -160,5 +164,43 @@ public class BashekimGUI extends JFrame {
 		
 		jtableDoktorList = new JTable(doctorModel);
 		scrollPaneDoktor.setViewportView(jtableDoktorList);
+		
+		btnAddDoktor.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(txtDNameSurname.getText().length()==0 || 
+						passwordFieldDoktor.getText().length()==0 || 
+						textDTcNo.getText().length()==0) {
+						Helper.showMessage("fill");
+				}else {
+					try {
+						boolean control= bashekim.addDoctor(textDTcNo.getText(), passwordFieldDoktor.getText(), txtDNameSurname.getText());
+						if(control) {
+							Helper.showMessage("success");
+							textDTcNo.setText(null);
+							passwordFieldDoktor.setText(null);
+							txtDNameSurname.setText(null);
+							updateDoctorModel();
+						}
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+			}
+		});
+		
 	}
+	
+	public void updateDoctorModel() throws SQLException {
+		DefaultTableModel clearModel= (DefaultTableModel) jtableDoktorList.getModel();
+		clearModel.setRowCount(0);
+		for(int i=0; i<bashekim.GetDoctorList().size(); i++)	{
+			doctorData[0]=bashekim.GetDoctorList().get(i).getId();
+			doctorData[1]=bashekim.GetDoctorList().get(i).getTc_No();
+			doctorData[2]=bashekim.GetDoctorList().get(i).getPassword();
+			doctorData[3]=bashekim.GetDoctorList().get(i).getName();
+			doctorModel.addRow(doctorData);
+		}	
+	}
+	
 }
