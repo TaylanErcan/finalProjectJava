@@ -1,6 +1,7 @@
 package Model;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -8,6 +9,10 @@ import java.util.ArrayList;
 
 public class Bashekim extends User {
 	
+	Statement st= null;
+	ResultSet rs= null;
+	Connection con= conn.conDb();
+	PreparedStatement preparedStatement= null;
 
 	public Bashekim(int id, String tc_No, String password, String name, String type) {
 		super(id, tc_No, password, name, type);
@@ -18,9 +23,6 @@ public class Bashekim extends User {
 	
 	public ArrayList<User> GetDoctorList() throws SQLException{
 		ArrayList<User> list= new ArrayList<>();
-		Statement st= null;
-		ResultSet rs= null;
-		Connection con= conn.conDb();
 		User obj;
 		try {
 			st= con.createStatement();
@@ -31,13 +33,34 @@ public class Bashekim extends User {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}finally{
-			st.close();
-			rs.close();
-			con.close();
+		}	
+		return list;
+	}
+	
+	
+	public boolean addDoctor(String tcno,String password,String name) throws SQLException {
+		
+		String query= "INSERT INTO user" + "(Tc_No,Password,Name,Type) VALUES"+ "(?,?,?,?)";
+		boolean trueFalseFlag= false;
+		try {
+			st= con.createStatement();
+			preparedStatement= con.prepareStatement(query);
+			preparedStatement.setString(1, tcno);
+			preparedStatement.setString(2, password);
+			preparedStatement.setString(3, name);
+			preparedStatement.setString(4, "Doktor");
+			preparedStatement.executeUpdate();
+			trueFalseFlag= true;
+		}catch(Exception e){
+			e.printStackTrace();
 		}
 		
-		return list;
-
-	}
+		if(trueFalseFlag)
+			return true;
+		else
+			return false;
+		
+		}
+	
+	
 }
