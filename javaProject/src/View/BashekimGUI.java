@@ -6,6 +6,10 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
 import Model.Bashekim;
@@ -154,6 +158,7 @@ public class BashekimGUI extends JFrame {
 		txtDoktorId.setColumns(10);
 		
 		JButton btnDeleteDoktor = new JButton("Sil");
+		
 		btnDeleteDoktor.setFont(new Font("Times New Roman", Font.PLAIN, 17));
 		btnDeleteDoktor.setBounds(381, 283, 140, 32);
 		panel.add(btnDeleteDoktor);
@@ -164,6 +169,39 @@ public class BashekimGUI extends JFrame {
 		
 		jtableDoktorList = new JTable(doctorModel);
 		scrollPaneDoktor.setViewportView(jtableDoktorList);
+		jtableDoktorList.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				try {
+					txtDoktorId.setText(jtableDoktorList.getValueAt(jtableDoktorList.getSelectedRow(), 0).toString());
+				}catch(Exception ex) {
+					
+				}		
+			}
+		});
+		
+		jtableDoktorList.getModel().addTableModelListener(new TableModelListener() {
+			
+			@Override
+			public void tableChanged(TableModelEvent e) {
+				if(e.getType()== TableModelEvent.UPDATE) {
+					int selectedRowId= Integer.parseInt(jtableDoktorList.getValueAt(jtableDoktorList.getSelectedRow(), 0).toString());
+					String selectTC=jtableDoktorList.getValueAt(jtableDoktorList.getSelectedRow(), 1).toString();
+					String selectSifre=jtableDoktorList.getValueAt(jtableDoktorList.getSelectedRow(), 2).toString();
+					String selectAdSoyad=jtableDoktorList.getValueAt(jtableDoktorList.getSelectedRow(), 3).toString();
+					
+					try {
+						bashekim.updateDoctor(selectedRowId, selectTC, selectSifre, selectAdSoyad);
+						updateDoctorModel();
+					} catch (SQLException e1) {
+							e1.printStackTrace();
+					}
+					
+				}
+				
+			}
+		});
 		
 		btnAddDoktor.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -182,10 +220,32 @@ public class BashekimGUI extends JFrame {
 							updateDoctorModel();
 						}
 					} catch (SQLException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 				}
+			}
+		});
+		
+		btnDeleteDoktor.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(txtDoktorId.getText().length()==0) {
+					Helper.showMessage("Lütfen geçerli bir doktor kaydý seçiniz.");
+				}else {
+					if(Helper.confirm("sure")) {
+						int selectedID= Integer.parseInt(txtDoktorId.getText());
+						try {
+							boolean control= bashekim.deleteDoctor(selectedID);
+							if(control) {
+								Helper.showMessage("success");
+								txtDoktorId.setText(null);
+								updateDoctorModel();
+							}
+						} catch (SQLException e1) {
+							e1.printStackTrace();
+						}
+					}
+				}
+					
 			}
 		});
 		
