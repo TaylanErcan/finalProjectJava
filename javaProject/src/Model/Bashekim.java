@@ -60,7 +60,52 @@ public class Bashekim extends User {
 		else
 			return false;
 		
+	}
+	
+	public boolean deleteDoctor(int id) throws SQLException {
+		
+		String query= "DELETE FROM user WHERE Id = ?";
+		boolean successOrFailFlag= false;
+		try {
+			st= con.createStatement();
+			preparedStatement= con.prepareStatement(query);
+			preparedStatement.setInt(1, id);
+			preparedStatement.executeUpdate();
+			successOrFailFlag= true;
+		}catch(Exception e){
+			e.printStackTrace();
 		}
+		
+		if(successOrFailFlag)
+			return true;
+		else
+			return false;
+		
+	}
+	
+	public boolean updateDoctor(int id,String tcno, String password,String name) throws SQLException {
+		
+		String query= "UPDATE user SET Tc_No=?, Password=?, Name=? WHERE Id=?";
+		boolean successOrFailFlag= false;
+		try {
+			st= con.createStatement();
+			preparedStatement= con.prepareStatement(query);
+			preparedStatement.setString(1, tcno);
+			preparedStatement.setString(2, password);
+			preparedStatement.setString(3, name);
+			preparedStatement.setInt(4, id);
+			preparedStatement.executeUpdate();
+			successOrFailFlag= true;
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		if(successOrFailFlag)
+			return true;
+		else
+			return false;
+		
+	}
 	
 	
 }
