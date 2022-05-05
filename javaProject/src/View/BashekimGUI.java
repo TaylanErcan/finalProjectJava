@@ -8,6 +8,8 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MouseInputAdapter;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
@@ -17,21 +19,31 @@ import Model.Clinic;
 
 import java.awt.Color;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+
 import java.awt.Font;
+import java.awt.Point;
 import java.sql.SQLException;
 
 import javax.swing.JButton;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.ActionEvent;
 import Helper.*;
 
 public class BashekimGUI extends JFrame {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	/**
 	 * 
 	 */
@@ -50,6 +62,7 @@ public class BashekimGUI extends JFrame {
 	private JTextField txtClinicName;
 	private DefaultTableModel clinicModel = null;
 	private Object[] clinicData = null;
+	private JPopupMenu clinicMenu;
 
 	/**
 	 * Launch the application.
@@ -281,7 +294,38 @@ public class BashekimGUI extends JFrame {
 		scrollPaneClinic.setBounds(10, 11, 194, 304);
 		jPanelClinic.add(scrollPaneClinic);
 
+		clinicMenu = new JPopupMenu();
+		JMenuItem updateMenu = new JMenuItem("Güncelle");
+		JMenuItem deleteMenu = new JMenuItem("Sil");
+		clinicMenu.add(updateMenu);
+		clinicMenu.add(deleteMenu);
+
+		updateMenu.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int selectedClinicID = Integer
+						.parseInt(tableClinicList.getValueAt(tableClinicList.getSelectedRow(), 0).toString());
+				Clinic SelectedClinic = clinic.getFetch(selectedClinicID);
+				UpdateClinicGUI updateGUI = new UpdateClinicGUI(SelectedClinic);
+				updateGUI.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+				updateGUI.setVisible(true);
+			}
+
+		});
+
 		tableClinicList = new JTable(clinicModel);
+		tableClinicList.setComponentPopupMenu(clinicMenu);
+		tableClinicList.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				super.mousePressed(e);
+				Point point = e.getPoint(); // gettin click coordinates
+				int selectedRow = tableClinicList.rowAtPoint(point);
+				tableClinicList.setRowSelectionInterval(selectedRow, selectedRow);
+			}
+		});
+
 		scrollPaneClinic.setViewportView(tableClinicList);
 
 		JLabel lblClinicName = new JLabel("Poliklinik Ad\u0131");
@@ -306,11 +350,11 @@ public class BashekimGUI extends JFrame {
 
 		btnAddClinic.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(txtClinicName.getText().length()==0) {
+				if (txtClinicName.getText().length() == 0) {
 					Helper.showMessage("Lütfen klinik adýný boþ býrakmayýnýz.");
-				}else {
+				} else {
 					try {
-						if(clinic.addClinic(txtClinicName.getText())) {
+						if (clinic.addClinic(txtClinicName.getText())) {
 							Helper.showMessage("success");
 							txtClinicName.setText(null);
 							updateClinicModel();
@@ -321,6 +365,7 @@ public class BashekimGUI extends JFrame {
 				}
 			}
 		});
+
 	}
 
 	public void updateDoctorModel() throws SQLException {
@@ -334,7 +379,7 @@ public class BashekimGUI extends JFrame {
 			doctorModel.addRow(doctorData);
 		}
 	}
-	
+
 	public void updateClinicModel() throws SQLException {
 		DefaultTableModel clearModel = (DefaultTableModel) tableClinicList.getModel(); // type casting
 		clearModel.setRowCount(0);
