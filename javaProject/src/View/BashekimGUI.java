@@ -64,6 +64,7 @@ public class BashekimGUI extends JFrame {
 	private DefaultTableModel clinicModel = null;
 	private Object[] clinicData = null;
 	private JPopupMenu clinicMenu;
+	private JTable tableEmployee;
 
 	/**
 	 * Launch the application.
@@ -117,6 +118,14 @@ public class BashekimGUI extends JFrame {
 			clinicData[1] = clinic.GetClinicList().get(i).getName();
 			clinicModel.addRow(clinicData);
 		}
+
+		// Employee model
+		DefaultTableModel employeeModel = new DefaultTableModel();
+		Object[] colEmployee = new Object[2];
+		colEmployee[0] = "ID";
+		colEmployee[1] = "Ad Soyad";
+		employeeModel.setColumnIdentifiers(colEmployee);
+		Object[] employeeData = new Object[2];
 
 		setResizable(false);
 		setTitle("Hospital Automation System");
@@ -349,9 +358,12 @@ public class BashekimGUI extends JFrame {
 		btnAddClinic.setBounds(214, 61, 110, 31);
 		jPanelClinic.add(btnAddClinic);
 
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(334, 11, 187, 304);
-		jPanelClinic.add(scrollPane);
+		JScrollPane scrollPaneEmployee = new JScrollPane();
+		scrollPaneEmployee.setBounds(334, 11, 187, 304);
+		jPanelClinic.add(scrollPaneEmployee);
+
+		tableEmployee = new JTable();
+		scrollPaneEmployee.setViewportView(tableEmployee);
 
 		JComboBox cbxSelectDoctor = new JComboBox();
 		cbxSelectDoctor.setBounds(214, 244, 110, 22);
@@ -373,12 +385,12 @@ public class BashekimGUI extends JFrame {
 				if (selectedRow >= 0) {
 					String selClinic = tableClinicList.getModel().getValueAt(selectedRow, 0).toString();
 					int selClinicID = Integer.parseInt(selClinic);
-					Item doctorItem= (Item) cbxSelectDoctor.getSelectedItem();
+					Item doctorItem = (Item) cbxSelectDoctor.getSelectedItem();
 					try {
-						boolean control= bashekim.addEmployee(doctorItem.getKey(), selClinicID);
-						if(control) {
+						boolean control = bashekim.addEmployee(doctorItem.getKey(), selClinicID);
+						if (control) {
 							Helper.showMessage("success");
-						}else {
+						} else {
 							Helper.showMessage("error");
 						}
 					} catch (SQLException e1) {
@@ -393,6 +405,42 @@ public class BashekimGUI extends JFrame {
 		btnAddSelectedDoctor.setFont(new Font("SansSerif", Font.PLAIN, 14));
 		btnAddSelectedDoctor.setBounds(214, 277, 110, 31);
 		jPanelClinic.add(btnAddSelectedDoctor);
+
+		JButton btnChooseClinic = new JButton("Se\u00E7");
+		btnChooseClinic.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int selectedRow= tableClinicList.getSelectedRow();
+				if(selectedRow >0 ) {
+					String selClinic = tableClinicList.getModel().getValueAt(selectedRow, 0).toString();
+					int selClinicID = Integer.parseInt(selClinic);
+					DefaultTableModel clearModel= (DefaultTableModel) tableEmployee.getModel(); // clear table
+					clearModel.setRowCount(0);
+					
+					try {
+						for(int i=0; i< bashekim.getClinicSpecificDoctorlist(selClinicID).size();i++) {
+							employeeData[0]=bashekim.getClinicSpecificDoctorlist(selClinicID).get(i).getId();
+							employeeData[1]=bashekim.getClinicSpecificDoctorlist(selClinicID).get(i).getName();
+							employeeModel.addRow(employeeData);
+						}
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+					
+					tableEmployee.setModel(employeeModel);
+					
+				}else {
+					Helper.showMessage("Lütfen bir poliklinik seçiniz.");
+				}
+			}
+		});
+		btnChooseClinic.setFont(new Font("SansSerif", Font.PLAIN, 14));
+		btnChooseClinic.setBounds(214, 169, 110, 31);
+		jPanelClinic.add(btnChooseClinic);
+
+		JLabel lblClinicNameChoose = new JLabel("Poliklinik Ad\u0131");
+		lblClinicNameChoose.setFont(new Font("Arial", Font.PLAIN, 14));
+		lblClinicNameChoose.setBounds(214, 138, 110, 20);
+		jPanelClinic.add(lblClinicNameChoose);
 
 		btnAddClinic.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
