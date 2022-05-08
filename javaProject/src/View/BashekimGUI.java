@@ -37,6 +37,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.ActionEvent;
 import Helper.*;
+import javax.swing.JComboBox;
 
 public class BashekimGUI extends JFrame {
 
@@ -300,31 +301,35 @@ public class BashekimGUI extends JFrame {
 		clinicMenu.add(updateMenu);
 		clinicMenu.add(deleteMenu);
 
-		updateMenu.addActionListener(new ActionListener() {
+		/*
+		 * updateMenu.addActionListener(new ActionListener() {
+		 * 
+		 * @Override public void actionPerformed(ActionEvent e) { int selectedClinicID =
+		 * Integer
+		 * .parseInt(tableClinicList.getValueAt(tableClinicList.getSelectedRow(),
+		 * 0).toString()); Clinic SelectedClinic = clinic.getFetch(selectedClinicID);
+		 * UpdateClinicGUI updateGUI = new UpdateClinicGUI(SelectedClinic);
+		 * updateGUI.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		 * updateGUI.setVisible(true); updateGUI.addWindowListener(new WindowAdapter() {
+		 * 
+		 * @Override public void windowClosed(WindowEvent e) { try {
+		 * updateClinicModel(); } catch (Exception e2) { e2.printStackTrace(); }
+		 * 
+		 * } }); }
+		 * 
+		 * });
+		 */
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				int selectedClinicID = Integer
-						.parseInt(tableClinicList.getValueAt(tableClinicList.getSelectedRow(), 0).toString());
-				Clinic SelectedClinic = clinic.getFetch(selectedClinicID);
-				UpdateClinicGUI updateGUI = new UpdateClinicGUI(SelectedClinic);
-				updateGUI.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-				updateGUI.setVisible(true);
-			}
-
-		});
-
-		tableClinicList = new JTable(clinicModel);
-		tableClinicList.setComponentPopupMenu(clinicMenu);
-		tableClinicList.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mousePressed(MouseEvent e) {
-				super.mousePressed(e);
-				Point point = e.getPoint(); // gettin click coordinates
-				int selectedRow = tableClinicList.rowAtPoint(point);
-				tableClinicList.setRowSelectionInterval(selectedRow, selectedRow);
-			}
-		});
+		/*
+		 * tableClinicList = new JTable(clinicModel);
+		 * tableClinicList.setComponentPopupMenu(clinicMenu);
+		 * tableClinicList.addMouseListener(new MouseAdapter() {
+		 * 
+		 * @Override public void mousePressed(MouseEvent e) { super.mousePressed(e);
+		 * Point point = e.getPoint(); // gettin click coordinates int selectedRow =
+		 * tableClinicList.rowAtPoint(point);
+		 * tableClinicList.setRowSelectionInterval(selectedRow, selectedRow); } });
+		 */
 
 		scrollPaneClinic.setViewportView(tableClinicList);
 
@@ -347,6 +352,47 @@ public class BashekimGUI extends JFrame {
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(334, 11, 187, 304);
 		jPanelClinic.add(scrollPane);
+
+		JComboBox cbxSelectDoctor = new JComboBox();
+		cbxSelectDoctor.setBounds(214, 244, 110, 22);
+		for (int i = 0; i < bashekim.GetDoctorList().size(); i++) {
+			cbxSelectDoctor.addItem(
+					new Item(bashekim.GetDoctorList().get(i).getId(), bashekim.GetDoctorList().get(i).getName()));
+		}
+		cbxSelectDoctor.addActionListener(e -> { // lambda expression
+			JComboBox c = (JComboBox) e.getSource();
+			Item item = (Item) c.getSelectedItem();
+			System.out.println(item.getKey() + " : " + item.getValue());
+		});
+		jPanelClinic.add(cbxSelectDoctor);
+
+		JButton btnAddSelectedDoctor = new JButton("Doktor ekle");
+		btnAddSelectedDoctor.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int selectedRow = tableClinicList.getSelectedRow();
+				if (selectedRow >= 0) {
+					String selClinic = tableClinicList.getModel().getValueAt(selectedRow, 0).toString();
+					int selClinicID = Integer.parseInt(selClinic);
+					Item doctorItem= (Item) cbxSelectDoctor.getSelectedItem();
+					try {
+						boolean control= bashekim.addEmployee(doctorItem.getKey(), selClinicID);
+						if(control) {
+							Helper.showMessage("success");
+						}else {
+							Helper.showMessage("error");
+						}
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+				} else {
+					Helper.showMessage("Lütfen bir poliklinik seçiniz.");
+				}
+			}
+		});
+
+		btnAddSelectedDoctor.setFont(new Font("SansSerif", Font.PLAIN, 14));
+		btnAddSelectedDoctor.setBounds(214, 277, 110, 31);
+		jPanelClinic.add(btnAddSelectedDoctor);
 
 		btnAddClinic.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
