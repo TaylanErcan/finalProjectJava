@@ -143,7 +143,7 @@ public class BashekimGUI extends JFrame {
 		contentPaneBashekim.add(lblBashekimWelcome);
 
 		JButton btnBashekimExit = new JButton("\u00C7\u0131k\u0131\u015F yap");
-		btnBashekimExit.setBounds(432, 11, 114, 31);
+		btnBashekimExit.setBounds(417, 21, 114, 31);
 		contentPaneBashekim.add(btnBashekimExit);
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
