@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 public class Doctor extends User {
 	Statement st = null;
@@ -52,4 +53,46 @@ public class Doctor extends User {
 		else
 			return false;
 	}
+
+	public ArrayList<WHour> getWHourList(int doctor_id) throws SQLException {
+		ArrayList<WHour> list = new ArrayList<>();
+		WHour obj;
+		try {
+			st = con.createStatement();
+			rs = st.executeQuery("SELECT * FROM whour WHERE Status='Aktif' AND DoctorId=" + doctor_id);
+			while (rs.next()) {
+				obj = new WHour();
+				obj.setId(rs.getInt("Id"));
+				obj.setDoctorId(rs.getInt("DoctorId"));
+				obj.setDoctorName(rs.getString("DoctorName"));
+				obj.setStatus(rs.getString("Status"));
+				obj.setWDate(rs.getString("wDate"));
+				list.add(obj);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return list;
+	}
+
+	public boolean deleteWHour(int id) throws SQLException {
+
+		String query = "DELETE FROM whour WHERE Id = ?";
+		boolean successOrFailFlag = false;
+		try {
+			st = con.createStatement();
+			preparedStatement = con.prepareStatement(query);
+			preparedStatement.setInt(1, id);
+			preparedStatement.executeUpdate();
+			successOrFailFlag = true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		if (successOrFailFlag)
+			return true;
+		else
+			return false;
+	}
+
 }

@@ -6,6 +6,7 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
 
 import Model.Doctor;
 
@@ -32,6 +33,8 @@ public class DoctorGUI extends JFrame {
 	private JPanel doctorReservationPane;
 	private static Doctor doctor = new Doctor();
 	private JTable tableWHour;
+	private DefaultTableModel workingHourModel;
+	private Object[] wHourData = null;
 
 	/**
 	 * Launch the application.
@@ -52,7 +55,25 @@ public class DoctorGUI extends JFrame {
 	/**
 	 * Create the frame.
 	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public DoctorGUI(Doctor doctor) {
+
+		workingHourModel = new DefaultTableModel();
+		Object[] colWHour = new Object[2];
+		colWHour[0] = "ID";
+		colWHour[1] = "Tarih";
+		workingHourModel.setColumnIdentifiers(colWHour);
+		wHourData = new Object[2];
+		try {
+			for (int i = 0; i < doctor.getWHourList(doctor.getId()).size(); i++) {
+				wHourData[0] = doctor.getWHourList(doctor.getId()).get(i).getId();
+				wHourData[1] = doctor.getWHourList(doctor.getId()).get(i).getWDate();
+				workingHourModel.addRow(wHourData);
+			}
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+
 		setBackground(Color.LIGHT_GRAY);
 		setResizable(false);
 		setTitle("Hospital Automation System");
@@ -112,6 +133,7 @@ public class DoctorGUI extends JFrame {
 						boolean control = doctor.addWorkHour(doctor.getId(), doctor.getName(), selectedDateTime);
 						if (control) {
 							Helper.showMessage("success");
+							updateWHourModel(doctor);
 						} else {
 							Helper.showMessage("error");
 						}
@@ -123,14 +145,53 @@ public class DoctorGUI extends JFrame {
 			}
 		});
 		btnAddWHour.setFont(new Font("SansSerif", Font.PLAIN, 15));
-		btnAddWHour.setBounds(419, 11, 104, 26);
+		btnAddWHour.setBounds(335, 11, 89, 26);
 		workingHoursPanel.add(btnAddWHour);
 
 		JScrollPane scrollPaneWHour = new JScrollPane();
 		scrollPaneWHour.setBounds(10, 48, 513, 223);
 		workingHoursPanel.add(scrollPaneWHour);
 
-		tableWHour = new JTable();
+		tableWHour = new JTable(workingHourModel);
 		scrollPaneWHour.setViewportView(tableWHour);
+
+		JButton btnDeleteWHour = new JButton("Sil");
+		btnDeleteWHour.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int selectedRow = tableWHour.getSelectedRow();
+				if (selectedRow >= 0) {
+					String selRow = tableWHour.getModel().getValueAt(selectedRow, 0).toString();
+					int selID = Integer.parseInt(selRow);
+					boolean control;
+					try {
+						control = doctor.deleteWHour(selID);
+						if(control) {
+							Helper.showMessage("success");
+							updateWHourModel(doctor);
+						}else {
+							Helper.showMessage("iþlem baþarýsýz");
+						}
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+					
+				} else {
+					Helper.showMessage("Lütfen bir randevu saati seçiniz.");
+				}
+			}
+		});
+		btnDeleteWHour.setFont(new Font("SansSerif", Font.PLAIN, 15));
+		btnDeleteWHour.setBounds(434, 11, 89, 26);
+		workingHoursPanel.add(btnDeleteWHour);
+	}
+
+	public void updateWHourModel(Doctor doctor) throws SQLException {
+		DefaultTableModel clearModel = (DefaultTableModel) tableWHour.getModel();
+		clearModel.setRowCount(0);
+		for (int i = 0; i < doctor.getWHourList(doctor.getId()).size(); i++) {
+			wHourData[0] = doctor.getWHourList(doctor.getId()).get(i).getId();
+			wHourData[1] = doctor.getWHourList(doctor.getId()).get(i).getWDate();
+			workingHourModel.addRow(wHourData);
+		}
 	}
 }
