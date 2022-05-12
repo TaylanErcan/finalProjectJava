@@ -102,7 +102,7 @@ public class LoginGUI extends JFrame {
 
 		JButton btnDoktorLogin = new JButton("Giri\u015F Yap");
 
-		btnDoktorLogin.setBounds(50, 138, 341, 43);
+		btnDoktorLogin.setBounds(155, 137, 130, 43);
 		panelDoctor.add(btnDoktorLogin);
 
 		passwordFieldDoktor = new JPasswordField();
@@ -132,6 +132,13 @@ public class LoginGUI extends JFrame {
 		txtHastaTc.setColumns(10);
 
 		JButton btnHastaRegister = new JButton("Kay\u0131t Ol");
+		btnHastaRegister.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				RegisterGUI rGUI = new RegisterGUI();
+				rGUI.setVisible(true);
+				dispose();
+			}
+		});
 		btnHastaRegister.setBounds(60, 138, 142, 43);
 		panelHasta.add(btnHastaRegister);
 

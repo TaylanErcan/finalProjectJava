@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import Helper.Helper;
+
 public class Patient extends User {
 
 	Statement st = null;
@@ -22,7 +24,7 @@ public class Patient extends User {
 
 	public boolean Register(String tcno, String password, String name) throws SQLException {
 		int key = 0;
-		String query = "INSERT INTO user" + "(Tc_No,Password,Name) VALUES" + "(?,?,?)";
+		String query = "INSERT INTO user" + "(Tc_No,Password,Name,Type) VALUES" + "(?,?,?,?)";
 		boolean duplicate = false;
 		try {
 			st = con.createStatement();
@@ -30,6 +32,7 @@ public class Patient extends User {
 
 			while (rs.next()) {
 				duplicate = true;
+				Helper.showMessage("Bu TC numarasýna kayýtlý bir hasta zaten var!");
 				break;
 			}
 			if (!duplicate) {
@@ -37,10 +40,10 @@ public class Patient extends User {
 				preparedStatement.setString(1, tcno);
 				preparedStatement.setString(2, password);
 				preparedStatement.setString(3, name);
+				preparedStatement.setString(4, "Hasta");
 				preparedStatement.executeUpdate();
+				key = 1;
 			}
-
-			key = 1;
 
 		} catch (SQLException e) {
 			e.printStackTrace();
