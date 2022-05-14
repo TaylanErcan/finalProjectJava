@@ -8,9 +8,11 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
+import Helper.Helper;
 import Helper.Item;
 import Model.Clinic;
 import Model.Patient;
+import Model.WHour;
 
 import java.awt.Color;
 import javax.swing.JLabel;
@@ -34,6 +36,10 @@ public class PatientGUI extends JFrame {
 	private JTable tableDoctor;
 	private DefaultTableModel doctorModel;
 	private Object[] doctorData = null;
+	private JTable tableWHour;
+	private WHour whour = new WHour();
+	private DefaultTableModel wHourModel;
+	private Object[] wHourData = null;
 
 	/**
 	 * Launch the application.
@@ -57,13 +63,20 @@ public class PatientGUI extends JFrame {
 	 * @throws SQLException
 	 */
 	public PatientGUI(Patient patient) throws SQLException {
-		
+
 		doctorModel = new DefaultTableModel();
 		Object[] colDoctor = new Object[2];
-		colDoctor[0] = "ID";;
+		colDoctor[0] = "ID";
 		colDoctor[1] = "Ad Soyad";
 		doctorModel.setColumnIdentifiers(colDoctor);
 		doctorData = new Object[2];
+
+		wHourModel = new DefaultTableModel();
+		Object[] colWHour = new Object[2];
+		colWHour[0] = "ID";
+		colWHour[1] = "Tarih";
+		wHourModel.setColumnIdentifiers(colWHour);
+		wHourData = new Object[2];
 
 		setResizable(false);
 		setTitle("Hospital Automation System");
@@ -97,7 +110,7 @@ public class PatientGUI extends JFrame {
 		w_scrollDoctor.setBounds(10, 25, 214, 253);
 		p_appointmentPanel.add(w_scrollDoctor);
 
-		tableDoctor = new JTable();
+		tableDoctor = new JTable(doctorModel);
 		w_scrollDoctor.setViewportView(tableDoctor);
 
 		JLabel lblDocList = new JLabel("Doktor Listesi");
@@ -123,15 +136,74 @@ public class PatientGUI extends JFrame {
 				if (cbxSelectClinic.getSelectedIndex() != 0) {
 					JComboBox jCombo = (JComboBox) e.getSource();
 					Item item = (Item) jCombo.getSelectedItem();
-					DefaultTableModel clearModel= (DefaultTableModel) tableDoctor.getModel();
+					DefaultTableModel clearModel = (DefaultTableModel) tableDoctor.getModel();
 					clearModel.setRowCount(0);
-					
-					
+					try {
+						for (int i = 0; i < clinic.getClinicSpecificDoctorlist(item.getKey()).size(); i++) {
+							doctorData[0] = clinic.getClinicSpecificDoctorlist(item.getKey()).get(i).getId();
+							doctorData[1] = clinic.getClinicSpecificDoctorlist(item.getKey()).get(i).getName();
+							doctorModel.addRow(doctorData);
+						}
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+
+				} else {
+					DefaultTableModel clearModel = (DefaultTableModel) tableDoctor.getModel();
+					clearModel.setRowCount(0);
 				}
 			}
 		});
 
 		cbxSelectClinic.setBounds(234, 25, 131, 28);
 		p_appointmentPanel.add(cbxSelectClinic);
+
+		JLabel lblSelectDoctor = new JLabel("Doktor Se\u00E7");
+		lblSelectDoctor.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		lblSelectDoctor.setBounds(234, 85, 87, 17);
+		p_appointmentPanel.add(lblSelectDoctor);
+
+		JButton btnSelectDoctor = new JButton("Se\u00E7");
+		btnSelectDoctor.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int row = tableDoctor.getSelectedRow();
+				if (row >= 0) {
+					String value = tableDoctor.getModel().getValueAt(row, 0).toString();
+					int id = Integer.parseInt(value);
+					DefaultTableModel clearModel = (DefaultTableModel) tableWHour.getModel();
+					clearModel.setRowCount(0);
+
+					try {
+						for (int i = 0; i < whour.getWHourList(id).size(); i++) {
+							wHourData[0] = whour.getWHourList(id).get(i).getId();
+							wHourData[1] = whour.getWHourList(id).get(i).getWDate();
+							wHourModel.addRow(colWHour);
+						}
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+
+					tableWHour.setModel(wHourModel);
+
+				} else {
+					Helper.showMessage("Lütfen bir doktor seçin.");
+				}
+			}
+		});
+		btnSelectDoctor.setBounds(234, 105, 131, 28);
+		p_appointmentPanel.add(btnSelectDoctor);
+
+		JScrollPane w_scrollDoctorWhour = new JScrollPane();
+		w_scrollDoctorWhour.setBounds(375, 25, 184, 253);
+		p_appointmentPanel.add(w_scrollDoctorWhour);
+
+		tableWHour = new JTable();
+		w_scrollDoctorWhour.setViewportView(tableWHour);
+
+		JLabel lblAvaliableHoursDoc = new JLabel("Randevu Saatleri");
+		lblAvaliableHoursDoc.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		lblAvaliableHoursDoc.setBounds(377, 0, 111, 22);
+		p_appointmentPanel.add(lblAvaliableHoursDoc);
 	}
 }

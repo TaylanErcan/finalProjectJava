@@ -137,6 +137,28 @@ public class Clinic {
 		return c;	
 		
 	}
+	
+	public ArrayList<User> getClinicSpecificDoctorlist(int clinicId) throws SQLException {
+		ArrayList<User> list = new ArrayList<>();
+		User obj;
+		
+		try {
+			Connection con = conn.conDb();
+			st = con.createStatement();
+			rs = st.executeQuery(
+					" SELECT u.Id, u.Tc_No, u.Password, u.Name, u.Type FROM employee e LEFT JOIN user u ON e.user_id=u.Id WHERE clinic_id="
+					+ clinicId); // left join
+																																
+			while (rs.next()) {
+				obj = new User(rs.getInt("u.Id"), rs.getString("u.Tc_No"), rs.getString("u.Password"), rs.getString("u.Name"),
+						rs.getString("Type"));
+				list.add(obj);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return list;
+	}
 
 	public int getId() {
 		return Id;
