@@ -198,8 +198,9 @@ public class PatientGUI extends JFrame {
 		w_scrollDoctorWhour.setBounds(375, 25, 184, 253);
 		p_appointmentPanel.add(w_scrollDoctorWhour);
 
-		tableWHour = new JTable();
+		tableWHour = new JTable(wHourModel);
 		w_scrollDoctorWhour.setViewportView(tableWHour);
+		tableWHour.getColumnModel().getColumn(0).setPreferredWidth(5);
 
 		JLabel lblAvaliableHoursDoc = new JLabel("Randevu Saatleri");
 		lblAvaliableHoursDoc.setFont(new Font("Tahoma", Font.PLAIN, 13));
