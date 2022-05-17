@@ -40,6 +40,8 @@ public class PatientGUI extends JFrame {
 	private WHour whour = new WHour();
 	private DefaultTableModel wHourModel;
 	private Object[] wHourData = null;
+	private int selectedDoctorId = 0;
+	private String selectedDoctorName = null;
 
 	/**
 	 * Launch the application.
@@ -120,7 +122,7 @@ public class PatientGUI extends JFrame {
 
 		JLabel lblClinicName = new JLabel("Klinik Ad\u0131");
 		lblClinicName.setFont(new Font("Tahoma", Font.PLAIN, 13));
-		lblClinicName.setBounds(234, 5, 87, 17);
+		lblClinicName.setBounds(234, 24, 131, 17);
 		p_appointmentPanel.add(lblClinicName);
 
 		JComboBox cbxSelectClinic = new JComboBox();
@@ -155,12 +157,12 @@ public class PatientGUI extends JFrame {
 			}
 		});
 
-		cbxSelectClinic.setBounds(234, 25, 131, 28);
+		cbxSelectClinic.setBounds(234, 46, 131, 28);
 		p_appointmentPanel.add(cbxSelectClinic);
 
 		JLabel lblSelectDoctor = new JLabel("Doktor Se\u00E7");
 		lblSelectDoctor.setFont(new Font("Tahoma", Font.PLAIN, 13));
-		lblSelectDoctor.setBounds(234, 85, 87, 17);
+		lblSelectDoctor.setBounds(234, 85, 131, 17);
 		p_appointmentPanel.add(lblSelectDoctor);
 
 		JButton btnSelectDoctor = new JButton("Se\u00E7");
@@ -185,13 +187,15 @@ public class PatientGUI extends JFrame {
 					}
 
 					tableWHour.setModel(wHourModel);
+					selectedDoctorId = id;
+					selectedDoctorName = tableDoctor.getModel().getValueAt(row, 1).toString();
 
 				} else {
 					Helper.showMessage("Lütfen bir doktor seçin.");
 				}
 			}
 		});
-		btnSelectDoctor.setBounds(234, 105, 131, 28);
+		btnSelectDoctor.setBounds(234, 103, 131, 28);
 		p_appointmentPanel.add(btnSelectDoctor);
 
 		JScrollPane w_scrollDoctorWhour = new JScrollPane();
@@ -206,5 +210,47 @@ public class PatientGUI extends JFrame {
 		lblAvaliableHoursDoc.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		lblAvaliableHoursDoc.setBounds(377, 0, 111, 22);
 		p_appointmentPanel.add(lblAvaliableHoursDoc);
+
+		JLabel lblAddAppDate = new JLabel("Randevu Ekle");
+		lblAddAppDate.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		lblAddAppDate.setBounds(234, 155, 131, 17);
+		p_appointmentPanel.add(lblAddAppDate);
+
+		JButton btnAddAppDate = new JButton("Se\u00E7");
+		btnAddAppDate.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int selectedRow = tableWHour.getSelectedRow();
+				if (selectedRow >= 0) {
+					String date = tableWHour.getModel().getValueAt(selectedRow, 1).toString();
+					try {
+						boolean control = patient.AddAppointment(selectedDoctorId, patient.getId(), selectedDoctorName,
+								patient.getName(), date);
+						if (control) {
+							Helper.showMessage("success");
+							patient.updateWHourStatus(selectedDoctorId, date);
+							updateWHourModel(selectedDoctorId);
+						} else {
+							Helper.showMessage("error");
+						}
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+				} else {
+					Helper.showMessage("Lütfen geçerli bir tarih seçiniz.");
+				}
+			}
+		});
+		btnAddAppDate.setBounds(234, 172, 131, 28);
+		p_appointmentPanel.add(btnAddAppDate);
+	}
+
+	public void updateWHourModel(int doctor_id) throws SQLException {
+		DefaultTableModel clearModel = (DefaultTableModel) tableWHour.getModel();
+		clearModel.setRowCount(0); // bütün rowlarý sil
+		for (int i = 0; i < clinic.getClinicSpecificDoctorlist(doctor_id).size(); i++) {
+			doctorData[0] = clinic.getClinicSpecificDoctorlist(doctor_id).get(i).getId();
+			doctorData[1] = clinic.getClinicSpecificDoctorlist(doctor_id).get(i).getName();
+			doctorModel.addRow(doctorData);
+		}
 	}
 }

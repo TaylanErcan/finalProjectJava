@@ -55,4 +55,50 @@ public class Patient extends User {
 			return false;
 	}
 
+	public boolean AddAppointment(int doctor_id, int patient_id, String doctor_name, String patient_name,
+			String app_date) throws SQLException {
+		int key = 0;
+		String query = "INSERT INTO appointment" + "(DoctorId,PatientId,DoctorName,PatientName,AppDate) VALUES"
+				+ "(?,?,?,?,?)";
+		try {
+			preparedStatement = con.prepareStatement(query);
+			preparedStatement.setInt(1, doctor_id);
+			preparedStatement.setInt(2, patient_id);
+			preparedStatement.setString(3, doctor_name);
+			preparedStatement.setString(4, patient_name);
+			preparedStatement.setString(5, app_date);
+			preparedStatement.executeUpdate();
+			key = 1;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		if (key == 1)
+			return true;
+		else
+			return false;
+	}
+
+	public boolean updateWHourStatus(int doctor_id, String wHour) throws SQLException {
+		int key = 0;
+		String query = "UPDATE whour SET Status=? WHERE DoctorId=? AND wDate=?";
+		try {
+			preparedStatement = con.prepareStatement(query);
+			preparedStatement.setString(1, "Pasif");
+			preparedStatement.setInt(2, doctor_id);
+			preparedStatement.setString(3, wHour);
+			preparedStatement.executeUpdate();
+			key = 1;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		if (key == 1)
+			return true;
+		else
+			return false;
+	}
+
 }

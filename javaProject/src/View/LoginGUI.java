@@ -26,6 +26,7 @@ import javax.swing.JPasswordField;
 import Helper.*;
 import Model.Bashekim;
 import Model.Doctor;
+import Model.Patient;
 
 public class LoginGUI extends JFrame {
 
@@ -143,6 +144,44 @@ public class LoginGUI extends JFrame {
 		panelHasta.add(btnHastaRegister);
 
 		JButton btnHastaLogin = new JButton("Giri\u015F Yap");
+		btnHastaLogin.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (txtHastaTc.getText().length() == 0 || passwordFieldHasta.getText().length() == 0) {
+					Helper.showMessage("fill");
+				} else {
+					boolean key = true;
+					try {
+						Connection con = conn.conDb();
+						Statement st = con.createStatement();
+						ResultSet resultSet = st.executeQuery("SELECT * FROM user");
+						
+						while (resultSet.next()) {
+							if (txtHastaTc.getText().equals(resultSet.getString("Tc_No"))
+									&& passwordFieldHasta.getText().equals(resultSet.getString("Password"))) {
+								if (resultSet.getString("Type").equals("Hasta")) {
+									Patient patient = new Patient();
+									patient.setId(resultSet.getInt("Id"));
+									patient.setTc_No(resultSet.getString("Tc_No"));
+									patient.setPassword(resultSet.getString("Password"));
+									patient.setName(resultSet.getString("Name"));
+									patient.setType(resultSet.getString("Type"));
+									PatientGUI pGUI = new PatientGUI(patient);
+									pGUI.setVisible(true);
+									dispose();
+									key = false;
+								}
+							}
+						}
+					} catch (Exception e2) {
+						e2.printStackTrace();
+					}
+
+					if (key) {
+						Helper.showMessage("Böyle bir hasta kaydý bulunamadý.\nLütfen kayýt olun.");
+					}
+				}
+			}
+		});
 		btnHastaLogin.setBounds(249, 138, 142, 43);
 		panelHasta.add(btnHastaLogin);
 
