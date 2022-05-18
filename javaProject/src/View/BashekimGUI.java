@@ -143,6 +143,13 @@ public class BashekimGUI extends JFrame {
 		contentPaneBashekim.add(lblBashekimWelcome);
 
 		JButton btnBashekimExit = new JButton("\u00C7\u0131k\u0131\u015F yap");
+		btnBashekimExit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				LoginGUI login = new LoginGUI();
+				login.setVisible(true);
+				dispose();
+			}
+		});
 		btnBashekimExit.setBounds(417, 21, 114, 31);
 		contentPaneBashekim.add(btnBashekimExit);
 
@@ -409,26 +416,26 @@ public class BashekimGUI extends JFrame {
 		JButton btnChooseClinic = new JButton("Se\u00E7");
 		btnChooseClinic.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int selectedRow= tableClinicList.getSelectedRow();
-				if(selectedRow >0 ) {
+				int selectedRow = tableClinicList.getSelectedRow();
+				if (selectedRow > 0) {
 					String selClinic = tableClinicList.getModel().getValueAt(selectedRow, 0).toString();
 					int selClinicID = Integer.parseInt(selClinic);
-					DefaultTableModel clearModel= (DefaultTableModel) tableEmployee.getModel(); // clear table
+					DefaultTableModel clearModel = (DefaultTableModel) tableEmployee.getModel(); // clear table
 					clearModel.setRowCount(0);
-					
+
 					try {
-						for(int i=0; i< bashekim.getClinicSpecificDoctorlist(selClinicID).size();i++) {
-							employeeData[0]=bashekim.getClinicSpecificDoctorlist(selClinicID).get(i).getId();
-							employeeData[1]=bashekim.getClinicSpecificDoctorlist(selClinicID).get(i).getName();
+						for (int i = 0; i < bashekim.getClinicSpecificDoctorlist(selClinicID).size(); i++) {
+							employeeData[0] = bashekim.getClinicSpecificDoctorlist(selClinicID).get(i).getId();
+							employeeData[1] = bashekim.getClinicSpecificDoctorlist(selClinicID).get(i).getName();
 							employeeModel.addRow(employeeData);
 						}
 					} catch (SQLException e1) {
 						e1.printStackTrace();
 					}
-					
+
 					tableEmployee.setModel(employeeModel);
-					
-				}else {
+
+				} else {
 					Helper.showMessage("Lütfen bir poliklinik seçiniz.");
 				}
 			}

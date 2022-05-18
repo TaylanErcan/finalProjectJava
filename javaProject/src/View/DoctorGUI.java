@@ -86,6 +86,13 @@ public class DoctorGUI extends JFrame {
 		doctorReservationPane.setLayout(null);
 
 		JButton btnDoctorExit = new JButton("\u00C7\u0131k\u0131\u015F yap");
+		btnDoctorExit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				LoginGUI login = new LoginGUI();
+				login.setVisible(true);
+				dispose();
+			}
+		});
 		btnDoctorExit.setBounds(446, 22, 114, 31);
 		doctorReservationPane.add(btnDoctorExit);
 

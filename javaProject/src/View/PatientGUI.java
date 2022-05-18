@@ -10,6 +10,7 @@ import javax.swing.table.DefaultTableModel;
 
 import Helper.Helper;
 import Helper.Item;
+import Model.Appointment;
 import Model.Clinic;
 import Model.Patient;
 import Model.WHour;
@@ -42,6 +43,10 @@ public class PatientGUI extends JFrame {
 	private Object[] wHourData = null;
 	private int selectedDoctorId = 0;
 	private String selectedDoctorName = null;
+	private JTable tablePatientAppList;
+	private DefaultTableModel appointmentModel;
+	private Object[] appointmentData = null;
+	private Appointment appoint = new Appointment();
 
 	/**
 	 * Launch the application.
@@ -80,6 +85,20 @@ public class PatientGUI extends JFrame {
 		wHourModel.setColumnIdentifiers(colWHour);
 		wHourData = new Object[2];
 
+		appointmentModel = new DefaultTableModel();
+		Object[] colAppoint = new Object[3];
+		colAppoint[0] = "ID";
+		colAppoint[1] = "Doktor Adý";
+		colAppoint[2] = "Tarih";
+		appointmentModel.setColumnIdentifiers(colAppoint);
+		appointmentData = new Object[3];
+		for (int i = 0; i < appoint.GetPatientAppList(patient.getId()).size(); i++) {
+			appointmentData[0] = appoint.GetPatientAppList(patient.getId()).get(i).getId();
+			appointmentData[1] = appoint.GetPatientAppList(patient.getId()).get(i).getDoctorName();
+			appointmentData[2] = appoint.GetPatientAppList(patient.getId()).get(i).getAppointmentDate();
+			appointmentModel.addRow(appointmentData);
+		}
+
 		setResizable(false);
 		setTitle("Hospital Automation System");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -96,6 +115,13 @@ public class PatientGUI extends JFrame {
 		contentPane.add(pLabel);
 
 		JButton btnPExit = new JButton("\u00C7\u0131k\u0131\u015F yap");
+		btnPExit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				LoginGUI login = new LoginGUI();
+				login.setVisible(true);
+				dispose();
+			}
+		});
 		btnPExit.setBounds(448, 19, 114, 31);
 		contentPane.add(btnPExit);
 
@@ -229,6 +255,7 @@ public class PatientGUI extends JFrame {
 							Helper.showMessage("success");
 							patient.updateWHourStatus(selectedDoctorId, date);
 							updateWHourModel(selectedDoctorId);
+							updateAppointmentModel(patient.getId());
 						} else {
 							Helper.showMessage("error");
 						}
@@ -242,15 +269,37 @@ public class PatientGUI extends JFrame {
 		});
 		btnAddAppDate.setBounds(234, 172, 131, 28);
 		p_appointmentPanel.add(btnAddAppDate);
+
+		JPanel panelAppointmentList = new JPanel();
+		p_tabbedPane.addTab("Randevularým", null, panelAppointmentList, null);
+		panelAppointmentList.setLayout(null);
+
+		JScrollPane scrollPanePatientAppList = new JScrollPane();
+		scrollPanePatientAppList.setBounds(10, 11, 549, 267);
+		panelAppointmentList.add(scrollPanePatientAppList);
+
+		tablePatientAppList = new JTable(appointmentModel);
+		scrollPanePatientAppList.setViewportView(tablePatientAppList);
 	}
 
 	public void updateWHourModel(int doctor_id) throws SQLException {
 		DefaultTableModel clearModel = (DefaultTableModel) tableWHour.getModel();
 		clearModel.setRowCount(0); // bütün rowlarý sil
-		for (int i = 0; i < clinic.getClinicSpecificDoctorlist(doctor_id).size(); i++) {
-			doctorData[0] = clinic.getClinicSpecificDoctorlist(doctor_id).get(i).getId();
-			doctorData[1] = clinic.getClinicSpecificDoctorlist(doctor_id).get(i).getName();
-			doctorModel.addRow(doctorData);
+		for (int i = 0; i < whour.getWHourList(doctor_id).size(); i++) {
+			wHourData[0] = whour.getWHourList(doctor_id).get(i).getId();
+			wHourData[1] = whour.getWHourList(doctor_id).get(i).getWDate();
+			wHourModel.addRow(wHourData);
+		}
+	}
+
+	public void updateAppointmentModel(int patient_id) throws SQLException {
+		DefaultTableModel clearModel = (DefaultTableModel) tablePatientAppList.getModel();
+		clearModel.setRowCount(0);
+		for (int i = 0; i < appoint.GetPatientAppList(patient_id).size(); i++) {
+			appointmentData[0] = appoint.GetPatientAppList(patient_id).get(i).getId();
+			appointmentData[1] = appoint.GetPatientAppList(patient_id).get(i).getDoctorName();
+			appointmentData[2] = appoint.GetPatientAppList(patient_id).get(i).getAppointmentDate();
+			appointmentModel.addRow(appointmentData);
 		}
 	}
 }
